@@ -1,6 +1,50 @@
 /*
-See LICENSE folder for this sample’s licensing information.
+TrueBreath
 
+Copyright © 2024 Mohamed Gaber
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+*/
+/*
+From TrueDepthStreamer
+
+Copyright © 2021 Apple Inc.
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+*/
+/*
 Abstract:
 Contains view controller code for previewing live-captured content.
 */
@@ -10,8 +54,10 @@ import AVFoundation
 import CoreVideo
 import MobileCoreServices
 import Accelerate
+import Alamofire
+import Atomics
 
-@available(iOS 11.1, *)
+@available(iOS 17, *)
 class CameraViewController: UIViewController, AVCaptureDataOutputSynchronizerDelegate {
     
     // MARK: - Properties
@@ -43,10 +89,10 @@ class CameraViewController: UIViewController, AVCaptureDataOutputSynchronizerDel
     private var isSessionRunning = false
     
     // Communicate with the session and other session objects on this queue.
-    private let sessionQueue = DispatchQueue(label: "session queue", attributes: [], autoreleaseFrequency: .workItem)
+    private let sessionQueue = DispatchQueue(label: "website.donn.TrueBreath::sessionQueue", attributes: [], autoreleaseFrequency: .workItem)
     private var videoDeviceInput: AVCaptureDeviceInput!
     
-    private let dataOutputQueue = DispatchQueue(label: "video data queue", qos: .userInitiated, attributes: [], autoreleaseFrequency: .workItem)
+    private let dataOutputQueue = DispatchQueue(label: "website.donn.TrueBreath::dataOutputQueue", qos: .userInitiated, attributes: [], autoreleaseFrequency: .workItem)
     
     private let videoDataOutput = AVCaptureVideoDataOutput()
     private let depthDataOutput = AVCaptureDepthDataOutput()
@@ -68,10 +114,6 @@ class CameraViewController: UIViewController, AVCaptureDataOutputSynchronizerDel
     
     private var touchCoordinates = CGPoint(x: 0, y: 0)
     
-    @IBOutlet weak private var cloudView: PointCloudMetalView!
-    
-    @IBOutlet weak private var cloudToJETSegCtrl: UISegmentedControl!
-    
     @IBOutlet weak private var smoothDepthLabel: UILabel!
     
     private var lastScale = Float(1.0)
@@ -87,10 +129,10 @@ class CameraViewController: UIViewController, AVCaptureDataOutputSynchronizerDel
     private var viewFrameSize = CGSize()
     
     private var autoPanningIndex = Int(0) // start with auto-panning on
-    
+        
     // MARK: - View Controller Life Cycle
-    
     override func viewDidLoad() {
+        UIApplication.shared.isIdleTimerDisabled = true
         super.viewDidLoad()
         
         viewFrameSize = self.view.frame.size
@@ -103,23 +145,7 @@ class CameraViewController: UIViewController, AVCaptureDataOutputSynchronizerDel
         pressGestureJET.cancelsTouchesInView = false
         jetView.addGestureRecognizer(pressGestureJET)
         
-        let pinchGesture = UIPinchGestureRecognizer(target: self, action: #selector(handlePinch))
-        cloudView.addGestureRecognizer(pinchGesture)
-        
-        let doubleTapGesture = UITapGestureRecognizer(target: self, action: #selector(handleDoubleTap))
-        doubleTapGesture.numberOfTapsRequired = 2
-        doubleTapGesture.numberOfTouchesRequired = 1
-        cloudView.addGestureRecognizer(doubleTapGesture)
-        
-        let rotateGesture = UIRotationGestureRecognizer(target: self, action: #selector(handleRotate))
-        cloudView.addGestureRecognizer(rotateGesture)
-        
-        let panOneFingerGesture = UIPanGestureRecognizer(target: self, action: #selector(handlePanOneFinger))
-        panOneFingerGesture.maximumNumberOfTouches = 1
-        panOneFingerGesture.minimumNumberOfTouches = 1
-        cloudView.addGestureRecognizer(panOneFingerGesture)
-        
-        cloudToJETSegCtrl.selectedSegmentIndex = 1
+        JETEnabled = true
         
         // Check video authorization status, video access is required
         switch AVCaptureDevice.authorizationStatus(for: .video) {
@@ -269,21 +295,21 @@ class CameraViewController: UIViewController, AVCaptureDataOutputSynchronizerDel
     
     func showThermalState(state: ProcessInfo.ThermalState) {
         DispatchQueue.main.async {
-            var thermalStateString = "UNKNOWN"
-            if state == .nominal {
-                thermalStateString = "NOMINAL"
-            } else if state == .fair {
-                thermalStateString = "FAIR"
-            } else if state == .serious {
-                thermalStateString = "SERIOUS"
-            } else if state == .critical {
-                thermalStateString = "CRITICAL"
-            }
-            
-            let message = NSLocalizedString("Thermal state: \(thermalStateString)", comment: "Alert message when thermal state has changed")
-            let alertController = UIAlertController(title: "TrueDepthStreamer", message: message, preferredStyle: .alert)
-            alertController.addAction(UIAlertAction(title: NSLocalizedString("OK", comment: "Alert OK button"), style: .cancel, handler: nil))
-            self.present(alertController, animated: true, completion: nil)
+//            var thermalStateString = "UNKNOWN"
+//            if state == .nominal {
+//                thermalStateString = "NOMINAL"
+//            } else if state == .fair {
+//                thermalStateString = "FAIR"
+//            } else if state == .serious {
+//                thermalStateString = "SERIOUS"
+//            } else if state == .critical {
+//                thermalStateString = "CRITICAL"
+//            }
+//            
+//            let message = NSLocalizedString("Thermal state: \(thermalStateString)", comment: "Alert message when thermal state has changed")
+//            let alertController = UIAlertController(title: "TrueDepthStreamer", message: message, preferredStyle: .alert)
+//            alertController.addAction(UIAlertAction(title: NSLocalizedString("OK", comment: "Alert OK button"), style: .cancel, handler: nil))
+//            self.present(alertController, animated: true, completion: nil)
         }
     }
     override var supportedInterfaceOrientations: UIInterfaceOrientationMask {
@@ -419,18 +445,22 @@ class CameraViewController: UIViewController, AVCaptureDataOutputSynchronizerDel
             return
         }
         
-        // Search for highest resolution with half-point depth values
         let depthFormats = videoDevice.activeFormat.supportedDepthDataFormats
+        for format in depthFormats {
+            print(format)
+        }
         let filtered = depthFormats.filter({
             CMFormatDescriptionGetMediaSubType($0.formatDescription) == kCVPixelFormatType_DepthFloat16
         })
         let selectedFormat = filtered.max(by: {
-            first, second in CMVideoFormatDescriptionGetDimensions(first.formatDescription).width < CMVideoFormatDescriptionGetDimensions(second.formatDescription).width
+            first, second in CMVideoFormatDescriptionGetDimensions(first.formatDescription).width > CMVideoFormatDescriptionGetDimensions(second.formatDescription).width
         })
         
         do {
             try videoDevice.lockForConfiguration()
             videoDevice.activeDepthDataFormat = selectedFormat
+            videoDevice.activeVideoMinFrameDuration = CMTimeMake(value: 2,timescale: 10)
+            videoDevice.activeVideoMaxFrameDuration = CMTimeMake(value: 2,timescale: 10)
             videoDevice.unlockForConfiguration()
         } catch {
             print("Could not lock device for configuration: \(error)")
@@ -486,21 +516,6 @@ class CameraViewController: UIViewController, AVCaptureDataOutputSynchronizerDel
         
         sessionQueue.async {
             self.depthDataOutput.isFilteringEnabled = smoothingEnabled
-        }
-    }
-    
-    @IBAction func changeCloudToJET(_ sender: UISegmentedControl) {
-        JETEnabled = (sender.selectedSegmentIndex == 0)
-        
-        sessionQueue.sync {
-            if JETEnabled {
-                self.depthDataOutput.isFilteringEnabled = self.depthSmoothingSwitch.isOn
-            } else {
-                self.depthDataOutput.isFilteringEnabled = false
-            }
-            
-            self.cloudView.isHidden = JETEnabled
-            self.jetView.isHidden = !JETEnabled
         }
     }
     
@@ -624,79 +639,7 @@ class CameraViewController: UIViewController, AVCaptureDataOutputSynchronizerDel
             }
         }
     }
-    
-    // MARK: - Point cloud view gestures
-    
-    @IBAction private func handlePinch(_ gesture: UIPinchGestureRecognizer) {
-        if gesture.numberOfTouches != 2 {
-            return
-        }
-        if gesture.state == .began {
-            lastScale = 1
-        } else if gesture.state == .changed {
-            let scale = Float(gesture.scale)
-            let diff: Float = scale - lastScale
-            let factor: Float = 1e3
-            if scale < lastScale {
-                lastZoom = diff * factor
-            } else {
-                lastZoom = diff * factor
-            }
-            DispatchQueue.main.async {
-                self.autoPanningSwitch.isOn = false
-                self.autoPanningIndex = -1
-            }
-            cloudView.moveTowardCenter(lastZoom)
-            lastScale = scale
-        } else if gesture.state == .ended {
-        } else {
-        }
-    }
-    
-    @IBAction private func handlePanOneFinger(gesture: UIPanGestureRecognizer) {
-        if gesture.numberOfTouches != 1 {
-            return
-        }
-        
-        if gesture.state == .began {
-            let pnt: CGPoint = gesture.translation(in: cloudView)
-            lastXY = pnt
-        } else if (.failed != gesture.state) && (.cancelled != gesture.state) {
-            let pnt: CGPoint = gesture.translation(in: cloudView)
-            DispatchQueue.main.async {
-                self.autoPanningSwitch.isOn = false
-                self.autoPanningIndex = -1
-            }
-            cloudView.yawAroundCenter(Float((pnt.x - lastXY.x) * 0.1))
-            cloudView.pitchAroundCenter(Float((pnt.y - lastXY.y) * 0.1))
-            lastXY = pnt
-        }
-    }
-    
-    @IBAction private func handleDoubleTap(gesture: UITapGestureRecognizer) {
-        DispatchQueue.main.async {
-            self.autoPanningSwitch.isOn = false
-            self.autoPanningIndex = -1
-        }
-        cloudView.resetView()
-    }
-    
-    @IBAction private func handleRotate(gesture: UIRotationGestureRecognizer) {
-        if gesture.numberOfTouches != 2 {
-            return
-        }
-        
-        if gesture.state == .changed {
-            let rot = Float(gesture.rotation)
-            DispatchQueue.main.async {
-                self.autoPanningSwitch.isOn = false
-                self.autoPanningIndex = -1
-            }
-            cloudView.rollAroundCenter(rot * 60)
-            gesture.rotation = 0
-        }
-    }
-    
+
     // MARK: - JET view Depth label gesture
     
     @IBAction private func handleLongPressJET(gesture: UILongPressGestureRecognizer) {
@@ -729,7 +672,6 @@ class CameraViewController: UIViewController, AVCaptureDataOutputSynchronizerDel
     }
     
     // MARK: - Video + Depth Frame Processing
-    
     func dataOutputSynchronizer(_ synchronizer: AVCaptureDataOutputSynchronizer,
                                 didOutput synchronizedDataCollection: AVCaptureSynchronizedDataCollection) {
         
@@ -759,58 +701,45 @@ class CameraViewController: UIViewController, AVCaptureDataOutputSynchronizerDel
                 return
         }
         
-        if JETEnabled {
-            if !videoDepthConverter.isPrepared {
-                /*
-                 outputRetainedBufferCountHint is the number of pixel buffers we expect to hold on to from the renderer.
-                 This value informs the renderer how to size its buffer pool and how many pixel buffers to preallocate. Allow 2 frames of latency
-                 to cover the dispatch_async call.
-                 */
-                var depthFormatDescription: CMFormatDescription?
-                CMVideoFormatDescriptionCreateForImageBuffer(allocator: kCFAllocatorDefault,
-                                                             imageBuffer: depthPixelBuffer,
-                                                             formatDescriptionOut: &depthFormatDescription)
-                videoDepthConverter.prepare(with: depthFormatDescription!, outputRetainedBufferCountHint: 2)
-            }
-            
-            guard let jetPixelBuffer = videoDepthConverter.render(pixelBuffer: depthPixelBuffer) else {
-                print("Unable to process depth")
-                return
-            }
-            
-            if !videoDepthMixer.isPrepared {
-                videoDepthMixer.prepare(with: formatDescription, outputRetainedBufferCountHint: 3)
-            }
-            
-            // Mix the video buffer with the last depth data we received
-            guard let mixedBuffer = videoDepthMixer.mix(videoPixelBuffer: videoPixelBuffer, depthPixelBuffer: jetPixelBuffer) else {
-                print("Unable to combine video and depth")
-                return
-            }
-            
-            jetView.pixelBuffer = mixedBuffer
-            
-            updateDepthLabel(depthFrame: depthPixelBuffer, videoFrame: videoPixelBuffer)
-        } else {
-            // point cloud
-            if self.autoPanningIndex >= 0 {
-                
-                // perform a circle movement
-                let moves = 200
-                
-                let factor = 2.0 * .pi / Double(moves)
-                
-                let pitch = sin(Double(self.autoPanningIndex) * factor) * 2
-                let yaw = cos(Double(self.autoPanningIndex) * factor) * 2
-                self.autoPanningIndex = (self.autoPanningIndex + 1) % moves
-                
-                cloudView?.resetView()
-                cloudView?.pitchAroundCenter(Float(pitch) * 10)
-                cloudView?.yawAroundCenter(Float(yaw) * 10)
-            }
-            
-            cloudView?.setDepthFrame(depthData, withTexture: videoPixelBuffer)
+        var writableData: Data!
+        depthPixelBuffer.withLockedBaseAddress {
+            writableData = Data(depthPixelBuffer.width.bytes + depthPixelBuffer.height.bytes)
+            writableData += Data(buffer: $0)
         }
+        tryWrite(data: writableData)
+        
+        if !videoDepthConverter.isPrepared {
+            /*
+             outputRetainedBufferCountHint is the number of pixel buffers we expect to hold on to from the renderer.
+             This value informs the renderer how to size its buffer pool and how many pixel buffers to preallocate. Allow 2 frames of latency
+             to cover the dispatch_async call.
+             */
+            var depthFormatDescription: CMFormatDescription?
+            CMVideoFormatDescriptionCreateForImageBuffer(allocator: kCFAllocatorDefault,
+                                                         imageBuffer: depthPixelBuffer,
+                                                         formatDescriptionOut: &depthFormatDescription)
+            videoDepthConverter.prepare(with: depthFormatDescription!, outputRetainedBufferCountHint: 2)
+        }
+        
+        guard let jetPixelBuffer = videoDepthConverter.render(pixelBuffer: depthPixelBuffer) else {
+            print("Unable to process depth")
+            return
+        }
+        
+        if !videoDepthMixer.isPrepared {
+            videoDepthMixer.prepare(with: formatDescription, outputRetainedBufferCountHint: 3)
+        }
+        
+        // Mix the video buffer with the last depth data we received
+        guard let mixedBuffer = videoDepthMixer.mix(videoPixelBuffer: videoPixelBuffer, depthPixelBuffer: jetPixelBuffer) else {
+            print("Unable to combine video and depth")
+            return
+        }
+        
+        jetView.pixelBuffer = mixedBuffer
+        
+        updateDepthLabel(depthFrame: depthPixelBuffer, videoFrame: videoPixelBuffer)
+
     }
     
     func updateDepthLabel(depthFrame: CVPixelBuffer, videoFrame: CVPixelBuffer) {
@@ -824,17 +753,18 @@ class CameraViewController: UIViewController, AVCaptureDataOutputSynchronizerDel
             }
             
             // scale
-            let scale = CGFloat(CVPixelBufferGetWidth(depthFrame)) / CGFloat(CVPixelBufferGetWidth(videoFrame))
-            let depthPoint = CGPoint(x: CGFloat(CVPixelBufferGetWidth(depthFrame)) - 1.0 - texturePoint.x * scale, y: texturePoint.y * scale)
+            let scale = CGFloat(depthFrame.width) / CGFloat(videoFrame.width)
+            let depthPointUnrotated = CGPoint(x: CGFloat(depthFrame.width) - 1.0 - texturePoint.x * scale, y: texturePoint.y * scale)
+            let midPoint = CGPoint(x: CGFloat(depthFrame.width) / 2 , y: CGFloat(depthFrame.height) / 2)
+            let depthPoint = depthPointUnrotated.rotate(around: midPoint, degrees: jetView.rotation.rawValue)
             
             assert(kCVPixelFormatType_DepthFloat16 == CVPixelBufferGetPixelFormatType(depthFrame))
-            CVPixelBufferLockBaseAddress(depthFrame, .readOnly)
-            let rowData = CVPixelBufferGetBaseAddress(depthFrame)! + Int(depthPoint.y) * CVPixelBufferGetBytesPerRow(depthFrame)
-            // swift does not have an Float16 data type. Use UInt16 instead, and then translate
-            var f16Pixel = rowData.assumingMemoryBound(to: UInt16.self)[Int(depthPoint.x)]
-            var f32Pixel = Float(0.0)
-
-            CVPixelBufferUnlockBaseAddress(depthFrame, .readOnly)
+            
+            var f16Pixel: UInt16 = 0
+            var f32Pixel: Float = 0.0
+            depthFrame.withLockedBaseAddress {
+                f16Pixel = $0[depthFrame.width * Int(depthPoint.y) + Int(depthPoint.x)]
+            }
             
             withUnsafeMutablePointer(to: &f16Pixel) { f16RawPointer in
                 withUnsafeMutablePointer(to: &f32Pixel) { f32RawPointer in
@@ -845,7 +775,7 @@ class CameraViewController: UIViewController, AVCaptureDataOutputSynchronizerDel
             }
             
             // Convert the depth frame format to cm
-            let depthString = String(format: "%.2f cm", f32Pixel * 100)
+            let depthString = String(format: "(%.2f, %.2f) %.2f cm", depthPoint.x, depthPoint.y, f32Pixel * 100)
             
             // Update the label
             DispatchQueue.main.async {
@@ -860,6 +790,55 @@ class CameraViewController: UIViewController, AVCaptureDataOutputSynchronizerDel
         }
     }
     
+    // MARK: Recording
+    @IBOutlet private var recordButton: UIButton!
+    
+    var fileSemaphore: DispatchSemaphore = DispatchSemaphore(value: 0)
+    var currentOutput: FileHandle?
+    var frames: Int = 0
+    
+    func getDocumentsDirectory() throws -> URL {
+         return try FileManager.default.url(for: .documentDirectory, in: .userDomainMask, appropriateFor: nil, create: false)
+    }
+    
+    @IBAction func onClickRecord(_ sender: Any) {
+        AF.request("http://Donns-Mac-Studio.local:8000/ping").response(queue: sessionQueue, completionHandler: {
+            response in
+            print(String(data: response.data!, encoding: .utf8)!)
+            let now = Date()
+            let formatter = DateFormatter()
+            formatter.timeZone = TimeZone.current
+            formatter.dateFormat = "HH-mm-ss"
+            let dateString = formatter.string(from: now)
+            let filename = "data_\(dateString)"
+            
+            self.frames = 0
+            let currentFile = try! self.getDocumentsDirectory().appendingPathComponent(filename)
+            FileManager.default.createFile(atPath: currentFile.path, contents: nil)
+            self.currentOutput = try! FileHandle(forWritingTo: currentFile)
+            self.fileSemaphore.wait()
+             
+            AF.upload(currentFile, to: "http://Donns-Mac-Studio.local:8000/\(filename)").response {
+                r in
+                print(r)
+            }
+        })
+    }
+    
+    func tryWrite(data: Data) {
+        if currentOutput == nil {
+            return
+        }
+        currentOutput!.write(data)
+        print("wrote frame \(frames)")
+        frames += 1
+        if frames == 5 * 60 {
+            try! currentOutput!.close()
+            currentOutput = nil
+            fileSemaphore.signal()
+        }
+        
+    }
 }
 
 extension AVCaptureVideoOrientation {
@@ -955,4 +934,3 @@ extension PreviewMetalView.Rotation {
         }
     }
 }
-

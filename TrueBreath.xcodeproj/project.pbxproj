@@ -11,9 +11,12 @@
 		261FA1F91E94641700BE8D47 /* Mixer.metal in Sources */ = {isa = PBXBuildFile; fileRef = 261FA1F81E94641700BE8D47 /* Mixer.metal */; };
 		2633CF1D1E7C65D500FC80E1 /* DepthToJETConverter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2633CF1C1E7C65D500FC80E1 /* DepthToJETConverter.swift */; };
 		2672370E1E79BFC0003D2EAA /* DepthToJET.metal in Sources */ = {isa = PBXBuildFile; fileRef = 2672370D1E79BFBF003D2EAA /* DepthToJET.metal */; };
-		6D20BC101FFE665100496684 /* PointCloudMetalView.mm in Sources */ = {isa = PBXBuildFile; fileRef = 6D20BC0F1FFE665100496684 /* PointCloudMetalView.mm */; };
+		702263D52BEE52E600F86C49 /* Alamofire in Frameworks */ = {isa = PBXBuildFile; productRef = 702263D42BEE52E600F86C49 /* Alamofire */; };
+		703B39562B9CF73000C6A950 /* CGPoint.swift in Sources */ = {isa = PBXBuildFile; fileRef = 703B39552B9CF73000C6A950 /* CGPoint.swift */; };
+		70556C332BA4E97A007F28B0 /* Atomics in Frameworks */ = {isa = PBXBuildFile; productRef = 70556C322BA4E97A007F28B0 /* Atomics */; };
+		70556C352BA4FC1F007F28B0 /* CVPixelBuffer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 70556C342BA4FC1F007F28B0 /* CVPixelBuffer.swift */; };
+		70556C372BA4FC4A007F28B0 /* FixedWidthInteger.swift in Sources */ = {isa = PBXBuildFile; fileRef = 70556C362BA4FC4A007F28B0 /* FixedWidthInteger.swift */; };
 		C3444A7D1FFE6110002D901D /* AAPLTransforms.mm in Sources */ = {isa = PBXBuildFile; fileRef = C3444A741FFE6110002D901D /* AAPLTransforms.mm */; };
-		C3444A7E1FFE6110002D901D /* PointCloud.metal in Sources */ = {isa = PBXBuildFile; fileRef = C3444A751FFE6110002D901D /* PointCloud.metal */; };
 		C3B256731FDE655200617DD7 /* HistogramCalculator.m in Sources */ = {isa = PBXBuildFile; fileRef = C3B256711FDE655100617DD7 /* HistogramCalculator.m */; };
 		E422DFC01CEF894F0047D7A4 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = E422DFBE1CEF894F0047D7A4 /* Main.storyboard */; };
 		E422DFC21CEF894F0047D7A4 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = E422DFC11CEF894F0047D7A4 /* Assets.xcassets */; };
@@ -31,17 +34,16 @@
 		2633CF1C1E7C65D500FC80E1 /* DepthToJETConverter.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DepthToJETConverter.swift; sourceTree = "<group>"; };
 		2672370D1E79BFBF003D2EAA /* DepthToJET.metal */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.metal; path = DepthToJET.metal; sourceTree = "<group>"; };
 		267ED84D1ED7965A00898078 /* TrueDepthStreamer-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "TrueDepthStreamer-Bridging-Header.h"; sourceTree = "<group>"; };
-		599ED10E56E1D2E68231F75C /* LICENSE.txt */ = {isa = PBXFileReference; includeInIndex = 1; path = LICENSE.txt; sourceTree = "<group>"; };
-		6D20BC0F1FFE665100496684 /* PointCloudMetalView.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = PointCloudMetalView.mm; sourceTree = "<group>"; };
-		A4E963F33EDFA721A40CA8B5 /* SampleCode.xcconfig */ = {isa = PBXFileReference; name = SampleCode.xcconfig; path = Configuration/SampleCode.xcconfig; sourceTree = "<group>"; };
-		C3444A731FFE6110002D901D /* PointCloudMetalView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PointCloudMetalView.h; sourceTree = "<group>"; };
+		703B39552B9CF73000C6A950 /* CGPoint.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CGPoint.swift; sourceTree = "<group>"; };
+		70556C342BA4FC1F007F28B0 /* CVPixelBuffer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CVPixelBuffer.swift; sourceTree = "<group>"; };
+		70556C362BA4FC4A007F28B0 /* FixedWidthInteger.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FixedWidthInteger.swift; sourceTree = "<group>"; };
+		A4E963F33EDFA721A40CA8B5 /* SampleCode.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; name = SampleCode.xcconfig; path = Configuration/SampleCode.xcconfig; sourceTree = "<group>"; };
 		C3444A741FFE6110002D901D /* AAPLTransforms.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = AAPLTransforms.mm; sourceTree = "<group>"; };
-		C3444A751FFE6110002D901D /* PointCloud.metal */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.metal; path = PointCloud.metal; sourceTree = "<group>"; };
 		C3444A781FFE6110002D901D /* AAPLTransforms.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AAPLTransforms.h; sourceTree = "<group>"; };
 		C3B256711FDE655100617DD7 /* HistogramCalculator.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HistogramCalculator.m; sourceTree = "<group>"; };
 		C3B256721FDE655200617DD7 /* HistogramCalculator.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HistogramCalculator.h; sourceTree = "<group>"; };
 		E414FC6C1D5921FD0007C979 /* README.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
-		E422DFB71CEF894F0047D7A4 /* TrueDepthStreamer.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = TrueDepthStreamer.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		E422DFB71CEF894F0047D7A4 /* TrueBreath.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = TrueBreath.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		E422DFBF1CEF894F0047D7A4 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		E422DFC11CEF894F0047D7A4 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		E422DFC41CEF894F0047D7A4 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
@@ -58,6 +60,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				70556C332BA4E97A007F28B0 /* Atomics in Frameworks */,
+				702263D52BEE52E600F86C49 /* Alamofire in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -69,7 +73,6 @@
 			children = (
 				E4A8A1411CF6188A006823AB /* PassThrough.metal */,
 				2672370D1E79BFBF003D2EAA /* DepthToJET.metal */,
-				C3444A751FFE6110002D901D /* PointCloud.metal */,
 				261FA1F81E94641700BE8D47 /* Mixer.metal */,
 			);
 			path = Shaders;
@@ -95,8 +98,6 @@
 			children = (
 				C3444A781FFE6110002D901D /* AAPLTransforms.h */,
 				C3444A741FFE6110002D901D /* AAPLTransforms.mm */,
-				C3444A731FFE6110002D901D /* PointCloudMetalView.h */,
-				6D20BC0F1FFE665100496684 /* PointCloudMetalView.mm */,
 			);
 			path = PointCloud;
 			sourceTree = "<group>";
@@ -105,23 +106,22 @@
 			isa = PBXGroup;
 			children = (
 				E414FC6C1D5921FD0007C979 /* README.md */,
-				E422DFB91CEF894F0047D7A4 /* TrueDepthStreamer */,
+				E422DFB91CEF894F0047D7A4 /* TrueBreath */,
 				E422DFB81CEF894F0047D7A4 /* Products */,
 				8F7DEDF83CEB2358D1CCC092 /* Configuration */,
 				5EC63FFD9D9A3793DBA4755D /* Configuration */,
-				F42A8FA83BE709B991729441 /* LICENSE */,
 			);
 			sourceTree = "<group>";
 		};
 		E422DFB81CEF894F0047D7A4 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				E422DFB71CEF894F0047D7A4 /* TrueDepthStreamer.app */,
+				E422DFB71CEF894F0047D7A4 /* TrueBreath.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
 		};
-		E422DFB91CEF894F0047D7A4 /* TrueDepthStreamer */ = {
+		E422DFB91CEF894F0047D7A4 /* TrueBreath */ = {
 			isa = PBXGroup;
 			children = (
 				C3B2FE6F1FFA8B9A00D8BC60 /* PointCloud */,
@@ -139,25 +139,19 @@
 				E422DFC31CEF894F0047D7A4 /* LaunchScreen.storyboard */,
 				E422DFC61CEF894F0047D7A4 /* Info.plist */,
 				267ED84D1ED7965A00898078 /* TrueDepthStreamer-Bridging-Header.h */,
+				703B39552B9CF73000C6A950 /* CGPoint.swift */,
+				70556C342BA4FC1F007F28B0 /* CVPixelBuffer.swift */,
+				70556C362BA4FC4A007F28B0 /* FixedWidthInteger.swift */,
 			);
-			path = TrueDepthStreamer;
-			sourceTree = "<group>";
-		};
-		F42A8FA83BE709B991729441 /* LICENSE */ = {
-			isa = PBXGroup;
-			children = (
-				599ED10E56E1D2E68231F75C /* LICENSE.txt */,
-			);
-			name = LICENSE;
-			path = LICENSE;
+			path = TrueBreath;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		E422DFB61CEF894F0047D7A4 /* TrueDepthStreamer */ = {
+		E422DFB61CEF894F0047D7A4 /* TrueBreath */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = E422DFC91CEF894F0047D7A4 /* Build configuration list for PBXNativeTarget "TrueDepthStreamer" */;
+			buildConfigurationList = E422DFC91CEF894F0047D7A4 /* Build configuration list for PBXNativeTarget "TrueBreath" */;
 			buildPhases = (
 				E422DFB31CEF894F0047D7A4 /* Sources */,
 				E422DFB41CEF894F0047D7A4 /* Frameworks */,
@@ -167,9 +161,13 @@
 			);
 			dependencies = (
 			);
-			name = TrueDepthStreamer;
+			name = TrueBreath;
+			packageProductDependencies = (
+				70556C322BA4E97A007F28B0 /* Atomics */,
+				702263D42BEE52E600F86C49 /* Alamofire */,
+			);
 			productName = TrueDepthViewer;
-			productReference = E422DFB71CEF894F0047D7A4 /* TrueDepthStreamer.app */;
+			productReference = E422DFB71CEF894F0047D7A4 /* TrueBreath.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
@@ -178,19 +176,19 @@
 		E422DFAF1CEF894F0047D7A4 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
+				BuildIndependentTargetsInParallel = YES;
 				LastSwiftUpdateCheck = 0800;
-				LastUpgradeCheck = 1300;
+				LastUpgradeCheck = 1530;
 				ORGANIZATIONNAME = Apple;
 				TargetAttributes = {
 					E422DFB61CEF894F0047D7A4 = {
 						CreatedOnToolsVersion = 8.0;
-						DevelopmentTeam = A93A5CM278;
 						LastSwiftMigration = 1100;
 						ProvisioningStyle = Automatic;
 					};
 				};
 			};
-			buildConfigurationList = E422DFB21CEF894F0047D7A4 /* Build configuration list for PBXProject "TrueDepthStreamer" */;
+			buildConfigurationList = E422DFB21CEF894F0047D7A4 /* Build configuration list for PBXProject "TrueBreath" */;
 			compatibilityVersion = "Xcode 13.0";
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
@@ -199,11 +197,15 @@
 				Base,
 			);
 			mainGroup = E422DFAE1CEF894F0047D7A4;
+			packageReferences = (
+				70556C312BA4E97A007F28B0 /* XCRemoteSwiftPackageReference "swift-atomics" */,
+				702263D32BEE52E600F86C49 /* XCRemoteSwiftPackageReference "Alamofire" */,
+			);
 			productRefGroup = E422DFB81CEF894F0047D7A4 /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				E422DFB61CEF894F0047D7A4 /* TrueDepthStreamer */,
+				E422DFB61CEF894F0047D7A4 /* TrueBreath */,
 			);
 		};
 /* End PBXProject section */
@@ -226,6 +228,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				70556C372BA4FC4A007F28B0 /* FixedWidthInteger.swift in Sources */,
 				E4E160DB1D00979000C83A5A /* FilterRenderer.swift in Sources */,
 				261FA1F71E945EEA00BE8D47 /* VideoMixer.swift in Sources */,
 				261FA1F91E94641700BE8D47 /* Mixer.metal in Sources */,
@@ -234,8 +237,8 @@
 				C3B256731FDE655200617DD7 /* HistogramCalculator.m in Sources */,
 				C3444A7D1FFE6110002D901D /* AAPLTransforms.mm in Sources */,
 				2633CF1D1E7C65D500FC80E1 /* DepthToJETConverter.swift in Sources */,
-				6D20BC101FFE665100496684 /* PointCloudMetalView.mm in Sources */,
-				C3444A7E1FFE6110002D901D /* PointCloud.metal in Sources */,
+				70556C352BA4FC1F007F28B0 /* CVPixelBuffer.swift in Sources */,
+				703B39562B9CF73000C6A950 /* CGPoint.swift in Sources */,
 				2672370E1E79BFC0003D2EAA /* DepthToJET.metal in Sources */,
 				E46129041CF4C0B8004FE176 /* PreviewMetalView.swift in Sources */,
 				E422DFCE1CEF8AF50047D7A4 /* CameraViewController.swift in Sources */,
@@ -303,6 +306,7 @@
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_NO_COMMON_BLOCKS = YES;
@@ -317,7 +321,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				MTL_ENABLE_DEBUG_INFO = YES;
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = iphoneos;
@@ -366,6 +370,7 @@
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_NO_COMMON_BLOCKS = YES;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
@@ -374,7 +379,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				SDKROOT = iphoneos;
 				SWIFT_COMPILATION_MODE = wholemodule;
@@ -393,8 +398,8 @@
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = "";
-				INFOPLIST_FILE = TrueDepthStreamer/Info.plist;
+				DEVELOPMENT_TEAM = XPZ49RF6C6;
+				INFOPLIST_FILE = TrueBreath/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -403,13 +408,18 @@
 				MTL_LANGUAGE_REVISION = UseDeploymentTarget;
 				MTL_OPTIMIZATION_LEVEL = 0;
 				OTHER_SWIFT_FLAGS = "";
-				PRODUCT_BUNDLE_IDENTIFIER = "com.example.apple-samplecode.TrueDepthStreamer${SAMPLE_CODE_DISAMBIGUATOR}";
+				PRODUCT_BUNDLE_IDENTIFIER = website.donn.truebreath;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SKIP_INSTALL = NO;
-				SWIFT_OBJC_BRIDGING_HEADER = "TrueDepthStreamer/TrueDepthStreamer-Bridging-Header.h";
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SWIFT_OBJC_BRIDGING_HEADER = "TrueBreath/TrueDepthStreamer-Bridging-Header.h";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
 				TOOLCHAINS = default;
 			};
 			name = Debug;
@@ -422,8 +432,8 @@
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = "";
-				INFOPLIST_FILE = TrueDepthStreamer/Info.plist;
+				DEVELOPMENT_TEAM = XPZ49RF6C6;
+				INFOPLIST_FILE = TrueBreath/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -431,12 +441,17 @@
 				);
 				MTL_LANGUAGE_REVISION = UseDeploymentTarget;
 				MTL_OPTIMIZATION_LEVEL = 0;
-				PRODUCT_BUNDLE_IDENTIFIER = "com.example.apple-samplecode.TrueDepthStreamer${SAMPLE_CODE_DISAMBIGUATOR}";
+				PRODUCT_BUNDLE_IDENTIFIER = website.donn.truebreath;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SKIP_INSTALL = NO;
-				SWIFT_OBJC_BRIDGING_HEADER = "TrueDepthStreamer/TrueDepthStreamer-Bridging-Header.h";
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SWIFT_OBJC_BRIDGING_HEADER = "TrueBreath/TrueDepthStreamer-Bridging-Header.h";
 				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
 				TOOLCHAINS = default;
 			};
 			name = Release;
@@ -444,7 +459,7 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		E422DFB21CEF894F0047D7A4 /* Build configuration list for PBXProject "TrueDepthStreamer" */ = {
+		E422DFB21CEF894F0047D7A4 /* Build configuration list for PBXProject "TrueBreath" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				E422DFC71CEF894F0047D7A4 /* Debug */,
@@ -453,7 +468,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		E422DFC91CEF894F0047D7A4 /* Build configuration list for PBXNativeTarget "TrueDepthStreamer" */ = {
+		E422DFC91CEF894F0047D7A4 /* Build configuration list for PBXNativeTarget "TrueBreath" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				E422DFCA1CEF894F0047D7A4 /* Debug */,
@@ -463,6 +478,38 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		702263D32BEE52E600F86C49 /* XCRemoteSwiftPackageReference "Alamofire" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/Alamofire/Alamofire";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 5.9.1;
+			};
+		};
+		70556C312BA4E97A007F28B0 /* XCRemoteSwiftPackageReference "swift-atomics" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/apple/swift-atomics.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.2.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		702263D42BEE52E600F86C49 /* Alamofire */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 702263D32BEE52E600F86C49 /* XCRemoteSwiftPackageReference "Alamofire" */;
+			productName = Alamofire;
+		};
+		70556C322BA4E97A007F28B0 /* Atomics */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 70556C312BA4E97A007F28B0 /* XCRemoteSwiftPackageReference "swift-atomics" */;
+			productName = Atomics;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = E422DFAF1CEF894F0047D7A4 /* Project object */;
 }

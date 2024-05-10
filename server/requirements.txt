@@ -1,0 +1,5 @@
+numpy
+bottle
+zstandard
+matplotlib
+click

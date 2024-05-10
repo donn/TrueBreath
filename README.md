@@ -1,187 +1,83 @@
-# Streaming Depth Data from the TrueDepth Camera
+# 🗣️ TrueBreath: Respiratory Rate Measurement using the TrueDepth Camera
 
-Visualize depth data in 2D and 3D from the TrueDepth camera.
+For a mobile & pervasive computing course paper. This app is a proof-of-concept
+breathing rate measurement device using the TrueDepth cameras on iPhone X and
+higher models.
 
-## Overview
+## Architecture
 
-The TrueDepth camera provides depth data in real time that allows you to determine the distance of a pixel from the front-facing camera. This sample demonstrates how to use the AVFoundation framework’s capture API to read data from the TrueDepth camera, and how to display it in an intuitive fashion onscreen.
+![](./how_it_works.png)
 
-The sample shows two different views: a 2D view that distinguishes depth values by mapping depth to color, and a 3D view that renders data as a point cloud.
+## Components
 
-To see this sample app in action, build and run the project in Xcode on an iOS device running iOS 11 or later. Because Xcode doesn’t have access to the TrueDepth camera, this sample will not build or run in the Xcode simulator.
+There's an iOS app that has to be run on an iPhone that supports Face ID. It's
+based on Apple's
+[Streaming Depth Data from the TrueDepth Camera](https://developer.apple.com/documentation/avfoundation/additional_data_capture/streaming_depth_data_from_the_truedepth_camera)
+code example, albeit with the point cloud component removed and the ability to
+record a minute of data to be uploaded to a server component (under `server/`)
+added. We fix the recording at 5 fps, which is still above the Nyquist
+frequency for human breathing (2Hz.)
 
-## Set Up a Capture Session
+The server component is responsible for calculating the breathing rate. Writing
+the calculation of the breathing rate to the phone in Swift is left as an
+exercise to the reader.
 
-Set up an `AVCaptureSession` on a separate thread via the session queue. Initialize this session queue before configuring the camera for capture, like so: 
+Here's how to test the app:
 
-``` swift
-private let sessionQueue = DispatchQueue(label: "session queue", attributes: [], autoreleaseFrequency: .workItem)
-```
+1. Prop your phone up at about arm's length at neck height, in landscape mode
+   (I propped it up against my monitor.)
+1. Use a metronome such as the one at https://www.musicca.com/metronome; set the
+   bpm to your target breathing rate * 2, then alternate breathing in and out
+   with every beat.
+1. Start the server in `server/simple_server.py`. Make sure your phone and Mac
+   are connected to the same network.
+1. Update the URLs in `TrueBreath/CameraViewController.swift` to target your
+   computer, then build and run the app. Wait for the app to launch.
+1. Take a few breaths, then tap record, maintaining the same breathing rate
+1. Wait one minute, then the server should print your breathing rate to stdout
 
-The `startRunning` method is a blocking call that may take time to execute. Dispatch session setup to the session queue so the main queue isn’t blocked, allowing the app’s UI to stay responsive:
+## Legal Stuff
 
-``` swift
-sessionQueue.async {
-    self.configureSession()
-}
-```
+Copyright © 2024 Mohamed Gaber
 
-Setting up the camera for video capture follows many of the same steps as normal video capture. See [Setting Up a Capture Session](https://developer.apple.com/documentation/avfoundation/cameras_and_media_capture/setting_up_a_capture_session) for details on configuring streaming setup.
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
 
-On top of normal setup, request depth data by declaring a separate output:
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
 
-``` swift
-private let depthDataOutput = AVCaptureDepthDataOutput()
-```
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
 
-Explicitly add this output type to your capture session:
+----
 
-``` swift
-session.addOutput(depthDataOutput)
-depthDataOutput.isFilteringEnabled = false
-if let connection = depthDataOutput.connection(with: .depthData) {
-    connection.isEnabled = true
-} else {
-    print("No AVCaptureConnection")
-}
-```
+Streaming Depth Data from the TrueDepth Camera
 
-Search for the highest resolution available with floating-point depth values, and lock the configuration to the format.
+Copyright © 2021 Apple Inc.
 
-``` swift
-let depthFormats = videoDevice.activeFormat.supportedDepthDataFormats
-let filtered = depthFormats.filter({
-    CMFormatDescriptionGetMediaSubType($0.formatDescription) == kCVPixelFormatType_DepthFloat16
-})
-let selectedFormat = filtered.max(by: {
-    first, second in CMVideoFormatDescriptionGetDimensions(first.formatDescription).width < CMVideoFormatDescriptionGetDimensions(second.formatDescription).width
-})
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
 
-do {
-    try videoDevice.lockForConfiguration()
-    videoDevice.activeDepthDataFormat = selectedFormat
-    videoDevice.unlockForConfiguration()
-} catch {
-    print("Could not lock device for configuration: \(error)")
-    setupResult = .configurationFailed
-    session.commitConfiguration()
-    return
-}
-```
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
 
-Synchronize the normal RGB video data with depth data output. The first output in the `dataOutputs` array is the master output.
-
-``` swift
-outputSynchronizer = AVCaptureDataOutputSynchronizer(dataOutputs: [videoDataOutput, depthDataOutput])
-outputSynchronizer!.setDelegate(self, queue: dataOutputQueue)
-```
-
-The `CameraViewController` implementation creates and manages this session to interface with the camera. It also contains UI to toggle between the two viewing modes, 2D and 3D.
-
-## Visualize Depth Data in 2D
-
-The sample uses JET color coding to distinguish depth values, ranging from red (close) to blue (far). A slider controls the blending of the color code and the actual color values. Touching a pixel displays its depth value.
-
-`DepthToJETConverter` performs the conversion. It separates the color spectrum into histogram bins, colors a Metal texture from depth values obtained in the image buffer, and renders that texture into the preview.
-
-``` swift
-var cvTextureOut: CVMetalTexture?
-CVMetalTextureCacheCreateTextureFromImage(kCFAllocatorDefault, textureCache, pixelBuffer, nil, textureFormat, width, height, 0, &cvTextureOut)
-guard let cvTexture = cvTextureOut, let texture = CVMetalTextureGetTexture(cvTexture) else {
-    print("Depth converter failed to create preview texture")
-    CVMetalTextureCacheFlush(textureCache, 0)
-    return nil
-}
-```
-
-## Visualize Depth Data in 3D
-
-The sample’s 3D viewer renders data as a point cloud. Control the camera with the following gestures:
-
-* Pinch to zoom. 
-* Pan to move the camera around the center. 
-* Rotate with two fingers to turn the camera angle. 
-* Double-tap the screen to reset the initial position. 
-
-The sample implements a 3D point cloud as a `PointCloudMetalView`. It uses a Metal vertex shader to control geometry and a Metal fragment shader to color individual vertices, keeping the depth texture and color texture separate:
-
-``` objective-c
-CVMetalTextureCacheRef _depthTextureCache;
-CVMetalTextureCacheRef _colorTextureCache;
-```
-
-The depth frame’s depth map provides the basis for the Metal view’s depth texture:
-
-``` objective-c
-CVPixelBufferRef depthFrame = depthData.depthDataMap;
-CVMetalTextureRef cvDepthTexture = nullptr;
-if (kCVReturnSuccess != CVMetalTextureCacheCreateTextureFromImage(kCFAllocatorDefault,
-                        _depthTextureCache,
-                        depthFrame,
-                        nil,
-                        MTLPixelFormatR16Float,
-                        CVPixelBufferGetWidth(depthFrame),
-                        CVPixelBufferGetHeight(depthFrame),
-                        0,
-                        &cvDepthTexture)) {
-    NSLog(@"Failed to create depth texture");
-    CVPixelBufferRelease(colorFrame);
-    return;
-}
-
-id<MTLTexture> depthTexture = CVMetalTextureGetTexture(cvDepthTexture);
-```
-
-The RGB image provides the basis for the Metal view’s color texture:
-
-``` objective-c
-CVMetalTextureRef cvColorTexture = nullptr;
-if (kCVReturnSuccess != CVMetalTextureCacheCreateTextureFromImage(kCFAllocatorDefault,
-                        _colorTextureCache,
-                        colorFrame,
-                        nil,
-                        MTLPixelFormatBGRA8Unorm,
-                        CVPixelBufferGetWidth(colorFrame),
-                        CVPixelBufferGetHeight(colorFrame),
-                        0,
-                        &cvColorTexture)) {
-    NSLog(@"Failed to create color texture");
-    CVPixelBufferRelease(colorFrame);
-    return;
-}
-
-id<MTLTexture> colorTexture = CVMetalTextureGetTexture(cvColorTexture);
-```
-
-## Track Thermal State
-
-Processing depth data from a live stream may cause the device to heat up. Keep tabs on the thermal state so you can alert the user if it exceeds a dangerous threshold.
-
-``` swift
-@objc
-func thermalStateChanged(notification: NSNotification) {
-    if let processInfo = notification.object as? ProcessInfo {
-        showThermalState(state: processInfo.thermalState)
-    }
-}
-
-func showThermalState(state: ProcessInfo.ThermalState) {
-    DispatchQueue.main.async {
-        var thermalStateString = "UNKNOWN"
-        if state == .nominal {
-            thermalStateString = "NOMINAL"
-        } else if state == .fair {
-            thermalStateString = "FAIR"
-        } else if state == .serious {
-            thermalStateString = "SERIOUS"
-        } else if state == .critical {
-            thermalStateString = "CRITICAL"
-        }
-        
-        let message = NSLocalizedString("Thermal state: \(thermalStateString)", comment: "Alert message when thermal state has changed")
-        let alertController = UIAlertController(title: "TrueDepthStreamer", message: message, preferredStyle: .alert)
-        alertController.addAction(UIAlertAction(title: NSLocalizedString("OK", comment: "Alert OK button"), style: .cancel, handler: nil))
-        self.present(alertController, animated: true, completion: nil)
-    }
-}
-```
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
