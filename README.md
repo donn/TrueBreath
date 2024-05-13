@@ -1,12 +1,19 @@
 # 🗣️ TrueBreath: Respiratory Rate Measurement using the TrueDepth Camera
 
 For a mobile & pervasive computing course paper. This app is a proof-of-concept
-breathing rate measurement device using the TrueDepth cameras on iPhone X and
-higher models.
+breathing rate measurement device using the TrueDepth cameras on iPhone X or
+later models.
 
 ## Architecture
 
-![](./how_it_works.png)
+The program is very simple architecturally. The depth image streamed from the
+TrueDepth camera has its values normalized to between 0 and 255, and pixels
+<= 128 are counted. This gives the area as a discrete function in time (t). A
+fast fourier transform is then performed on the Area function. The highest peak
+between 0 and 1 Hz (the normal range of human breathing) is considered the
+respiratory rate of the user.
+
+![A diagram showing the architecture from the previous paragraph](./how_it_works.png)
 
 ## Components
 
