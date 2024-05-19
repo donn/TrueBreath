@@ -26,8 +26,8 @@ def frames_from_file(io):
                 height,
                 width,
             )
-            arr = np.nan_to_num(arr, nan=5.12)  # set nans from to very far
             arr *= 100  # m to cm
+            arr = np.nan_to_num(arr, nan=512)  # set nans from to very far
             arr[arr > 128] = 512
             if len(frames):
                 difference = arr - frames[-1]
@@ -52,7 +52,7 @@ def frame_areas(frames):
     return areas, diffs
 
 
-def calc_breathing_rate(frames, fps, aux_data=None):
+def calc_breathing_rate(frames, fps, aux_data=None, target_diff=True):
     if aux_data is None:
         aux_data = {}
 
@@ -65,26 +65,24 @@ def calc_breathing_rate(frames, fps, aux_data=None):
     # The frequency domain
     xf = np.linspace(0, 1 / (2 * dx), N // 2)
 
-    ydiff_f = np.fft.fft(ydiff)
-    # ydiff_f_scaled = 2.0 / N * np.abs(ydiff_f[: N // 2])
-
-    ydiff_f_clean = np.abs(ydiff_f.copy())
+    target = np.fft.fft(ydiff) if target_diff else np.fft.fft(y)
+    target_clean = np.abs(target.copy())
     _cutoff_idx = None
     for i, f in enumerate(xf):
         if f > 1:
             _cutoff_idx = i
             break
 
-    for i, _ in enumerate(ydiff_f_clean):
+    for i, _ in enumerate(target_clean):
         if i > _cutoff_idx:
-            ydiff_f_clean[i] = 0
-    max_idx = np.argmax(ydiff_f_clean)
+            target_clean[i] = 0
+    max_idx = np.argmax(target_clean)
     breathing_rate = xf[max_idx]
     aux_data["N"] = len(frames)
     aux_data["x"] = x
     aux_data["xf"] = xf
     aux_data["y"] = y
-    aux_data["ydiff_f_clean"] = ydiff_f_clean
+    aux_data["target"] = target_clean
     return breathing_rate
 
 
@@ -113,18 +111,18 @@ def main(fps, show_plot, file):
     )
 
     aux_data = {}
-    breathing_rate = calc_breathing_rate(frames, fps, aux_data)
+    breathing_rate = calc_breathing_rate(frames, fps, aux_data, target_diff=True)
 
     print(f"Breathing rate: {breathing_rate} Hz ({breathing_rate * 60} bpm)")
 
     if show_plot in ["area"]:
         N = aux_data["N"]
-        ydiff_f_clean = aux_data["ydiff_f_clean"]
+        tgt = aux_data["target"]
         x = aux_data["x"]
         xf = aux_data["xf"]
         y = aux_data["y"]
 
-        ydiff_f_clean_scaled = 2.0 / N * np.abs(ydiff_f_clean[: N // 2])
+        tgt = 2.0 / N * np.abs(tgt[: N // 2])
         _, ax_at = plt.subplots()
         ax_at.plot(x, y)
         ax_at.set_title("Difference in area over time")
@@ -132,7 +130,7 @@ def main(fps, show_plot, file):
         ax_at.set_ylabel("area delta from last frame (pixels)")
 
         _, ax_fq = plt.subplots()
-        ax_fq.plot(xf, ydiff_f_clean_scaled)
+        ax_fq.plot(xf, tgt)
         ax_fq.set_title("Frequency domain (after low-pass filter)")
         ax_fq.set_xlabel("frequency (Hz)")
         ax_fq.set_ylabel("amplitude")
